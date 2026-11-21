@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#174f7c">
+<meta name="description" content="필요 환기량과 목표 반송속도로 상용 원형 덕트 규격을 추천하는 산업환기 계산기입니다.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="산업환기 계산기">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>산업환기 덕트 사이즈 추천</title>
+<style>
+:root{--navy:#174f7c;--blue:#236a9f;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--bg:#f3f6fa;--pale:#e8f2fc;--green:#16834a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;color:var(--ink);padding:22px 14px 40px}
+.wrap{max-width:760px;margin:auto}
+header{background:linear-gradient(135deg,#174f7c,#2879ae);color:white;padding:25px 22px;border-radius:20px;box-shadow:0 8px 24px #174f7c22}
+.eyebrow{font-size:12px;letter-spacing:1.3px;opacity:.8;font-weight:700}
+h1{font-size:25px;margin:7px 0 5px}
+header p{margin:0;font-size:13px;opacity:.88}
+.panel{background:white;border:1px solid #edf1f5;border-radius:18px;padding:21px;margin-top:16px;box-shadow:0 5px 18px #0f172a08}
+h2{font-size:17px;margin:0 0 17px}
+.field{margin-bottom:17px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+.inputrow{display:flex;align-items:center;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#fff}
+input{width:100%;min-width:0;border:0;outline:0;padding:14px 13px;font-size:19px;font-weight:650;color:var(--ink)}
+input:focus{box-shadow:inset 0 0 0 2px #3b82f6}
+.unit{padding:0 14px;color:var(--muted);font-size:14px;white-space:nowrap;background:#f8fafc;height:52px;display:flex;align-items:center;border-left:1px solid var(--line)}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+.actions{display:flex;gap:10px;margin-top:20px}
+button{border:0;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:750;cursor:pointer}
+.primary{background:var(--navy);color:white;flex:1}
+.secondary{background:#eef2f7;color:#334155}
+button:active{transform:translateY(1px)}
+.error{display:none;color:#b42318;background:#fff1f0;border:1px solid #ffd5d2;padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px}
+.result{display:none}
+.result-top{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.metric{background:#f4f7fb;border-radius:13px;padding:15px}
+.metric .cap{font-size:12px;color:var(--muted);font-weight:650}
+.metric strong{display:block;font-size:27px;margin-top:4px;letter-spacing:-.5px}
+.metric small{font-size:12px;color:var(--muted);font-weight:500}
+.recommend{margin-top:13px;padding:17px;border-radius:14px;background:#eaf5ee;border:1px solid #cce9d5}
+.recommend .cap{font-size:13px;color:#246b42;font-weight:750}
+.recommend strong{display:block;color:#12643a;font-size:30px;margin:3px 0}
+.recommend p{font-size:13px;color:#365b45;margin:0;line-height:1.5}
+.details{margin-top:15px;border-top:1px solid var(--line);padding-top:14px}
+.detailrow{display:flex;justify-content:space-between;gap:15px;padding:8px 0;font-size:13px}
+.detailrow span:first-child{color:var(--muted)}
+.detailrow b{text-align:right}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin:13px 0 0}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:280px}
+th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line)}
+th{color:#475569;background:#f8fafc;font-weight:750}
+tr.selected{background:#e3efff;font-weight:750;color:#174f7c}
+footer{text-align:center;color:#94a3b8;font-size:11px;padding:18px 5px}
+@media(max-width:420px){body{padding:13px 10px 30px}.panel{padding:17px}.result-top{gap:8px}.metric{padding:12px}.metric strong{font-size:23px}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">INDUSTRIAL VENTILATION</div>
+  <h1>덕트 사이즈 추천 계산기</h1>
+  <p>필요 풍량과 목표 반송속도로 상용 원형 덕트 규격을 추천합니다.</p>
+</header>
+
+<section class="panel">
+  <h2>① 계산 조건 입력</h2>
+  <div class="field">
+    <label for="flow">필요 환기량 (Q)</label>
+    <div class="inputrow"><input id="flow" type="number" min="0" step="any" inputmode="decimal" placeholder="예: 120"><span class="unit">㎥/min</span></div>
+    <div class="hint">후드에서 계산한 필요 환기량을 입력하세요.</div>
+  </div>
+  <div class="field">
+    <label for="velocity">목표 덕트 반송속도 (V)</label>
+    <div class="inputrow"><input id="velocity" type="number" min="0" step="any" inputmode="decimal" placeholder="예: 15"><span class="unit">m/s</span></div>
+  </div>
+  <div class="actions">
+    <button class="primary" id="calculate">덕트 사이즈 계산</button>
+    <button class="secondary" id="reset" type="button">초기화</button>
+  </div>
+  <div class="error" id="error" role="alert"></div>
+</section>
+
+<section class="panel result" id="result" aria-live="polite">
+  <h2>② 계산 결과</h2>
+  <div class="result-top">
+    <div class="metric"><div class="cap">이론 계산 직경</div><strong id="theory">-</strong><small>mm</small></div>
+    <div class="metric"><div class="cap">추천 상용 규격</div><strong id="nominal">-</strong><small id="inch">-</small></div>
+  </div>
+  <div class="recommend">
+    <div class="cap">추천 규격의 실제 반송속도</div>
+    <strong><span id="actual">-</span> <small>m/s</small></strong>
+    <p id="velocityMessage"></p>
+  </div>
+  <div class="details">
+    <div class="detailrow"><span>입력 풍량</span><b id="showFlow">-</b></div>
+    <div class="detailrow"><span>목표 반송속도</span><b id="showVelocity">-</b></div>
+    <div class="detailrow"><span>추천 규격 단면적</span><b id="area">-</b></div>
+    <div class="detailrow"><span>계산 직경과의 차이</span><b id="difference">-</b></div>
+  </div>
+  <p class="note">추천 방식: 계산 직경과 가장 가까운 상용 규격을 선택합니다. 실제 반송속도는 입력 풍량과 선택된 덕트 직경으로 다시 계산한 값입니다.</p>
+  <div class="actions"><button class="primary" id="copy" type="button">계산 결과 복사</button></div>
+</section>
+
+<section class="panel">
+  <h2>③ 상용 원형 덕트 규격표 (24종)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>호칭 (inch)</th><th>직경 (mm)</th><th>선택 상태</th></tr></thead>
+      <tbody id="ductTable"></tbody>
+    </table>
+  </div>
+  <p class="note">제공된 규격표의 호칭 및 직경을 기준으로 구성했습니다. 이 계산기는 원형 덕트를 가정하며, 실제 설계 시 압력손실·소음·재질·현장 조건 및 적용 기준을 별도로 검토하세요.</p>
+</section>
+<footer>산업환기 계산기 · DUCT SIZE CALCULATOR</footer>
+</div>
+<script>
+const ducts = [
+ ["3/8",10],["1/2",15],["3/4",20],["1",25],["1¼",32],["1½",40],
+ ["2",50],["2½",65],["3",80],["3½",90],["4",100],["5",125],
+ ["6",150],["8",200],["10",250],["12",300],["14",350],["16",400],
+ ["18",450],["20",500],["22",550],["24",600],["26",650],["30",750]
+];
+const $ = id => document.getElementById(id);
+let lastResult = null;
+
+function renderTable(selectedDiameter=null){
+  $("ductTable").innerHTML = ducts.map(([inch,mm]) => {
+    const selected = mm === selectedDiameter;
+    return `<tr class="${selected ? "selected" : ""}"><td>${inch}</td><td>${mm} mm</td><td>${selected ? "✓ 추천" : "—"}</td></tr>`;
+  }).join("");
+}
+function fmt(n, digits=2){
+  return Number(n).toLocaleString("ko-KR",{maximumFractionDigits:digits});
+}
+function calculate(){
+  const q = Number($("flow").value);
+  const v = Number($("velocity").value);
+  $("error").style.display="none";
+  if(!$("flow").value || !$("velocity").value || !Number.isFinite(q) || !Number.isFinite(v) || q<=0 || v<=0){
+    $("error").textContent="풍량과 반송속도에 0보다 큰 숫자를 입력해 주세요.";
+    $("error").style.display="block"; $("result").style.display="none"; return;
+  }
+  // Q: m³/min -> m³/s. D = sqrt(4Q / (πV)).
+  const qSec = q/60;
+  const dMm = Math.sqrt((4*qSec)/(Math.PI*v))*1000;
+  let chosen = ducts.reduce((best,item) =>
+    Math.abs(item[1]-dMm) < Math.abs(best[1]-dMm) ? item : best
+  , ducts[0]);
+  const [inch,diameter] = chosen;
+  const area = Math.PI*Math.pow(diameter/1000,2)/4;
+  const actualV = qSec/area;
+  const diff = diameter-dMm;
+
+  $("theory").textContent=fmt(dMm,1);
+  $("nominal").textContent=fmt(diameter,0);
+  $("inch").textContent=inch+" inch";
+  $("actual").textContent=fmt(actualV,2);
+  $("showFlow").textContent=fmt(q,2)+" ㎥/min";
+  $("showVelocity").textContent=fmt(v,2)+" m/s";
+  $("area").textContent=fmt(area,4)+" ㎡";
+  $("difference").textContent=(diff>0?"+":"")+fmt(diff,1)+" mm";
+  $("velocityMessage").textContent=`목표 ${fmt(v,2)} m/s 대비 ${actualV>=v ? "높은" : "낮은"} 속도입니다.`;
+  $("result").style.display="block";
+  lastResult={q,v,dMm,inch,diameter,actualV,area,diff};
+  renderTable(diameter);
+  $("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("calculate").addEventListener("click",calculate);
+$("reset").addEventListener("click",()=>{
+  $("flow").value=""; $("velocity").value="";
+  $("result").style.display="none"; $("error").style.display="none";
+  lastResult=null; renderTable(); $("flow").focus();
+});
+$("copy").addEventListener("click",async()=>{
+  if(!lastResult)return;
+  const r=lastResult;
+  const text=`[덕트 사이즈 계산 결과]\n필요 환기량: ${fmt(r.q,2)} ㎥/min\n목표 반송속도: ${fmt(r.v,2)} m/s\n이론 계산 직경: ${fmt(r.dMm,1)} mm\n추천 덕트: ${r.diameter} mm (${r.inch} inch)\n실제 반송속도: ${fmt(r.actualV,2)} m/s`;
+  try{await navigator.clipboard.writeText(text);$("copy").textContent="복사 완료";}
+  catch(e){$("copy").textContent="복사할 수 없습니다";}
+  setTimeout(()=>$("copy").textContent="계산 결과 복사",1800);
+});
+["flow","velocity"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")calculate()}));
+renderTable();
+
+// GitHub Pages 하위 경로에서도 동작하도록 현재 앱 경로를 기준으로 서비스 워커 등록
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(err => {
+      console.warn("오프라인 기능 등록 실패:", err);
+    });
+  });
+}
+</script>
+</body>
+</html>

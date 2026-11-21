@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "산업환기 계산기",
+  "short_name": "산업환기 계산기",
+  "description": "필요 환기량과 목표 반송속도로 상용 원형 덕트 규격을 추천하는 계산기",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f6fa",
+  "theme_color": "#174f7c",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
